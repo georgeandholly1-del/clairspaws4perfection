@@ -1,0 +1,32 @@
+:root {
+    --background: #F1EFED;
+    --burgundy: #542B35;
+    --terracotta: #6B3E35;
+    --text: #302B2A;
+    --sage: #899487;
+    --white: #FFFFFF;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.gallery {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    padding: 20px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px
+}
+
+.gallery img {
+    border-radius: 20px;
+    width: 100%;
+    height: 100%;
+        
+    object-fit: cover;
+}

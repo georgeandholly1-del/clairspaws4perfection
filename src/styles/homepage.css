@@ -1,0 +1,187 @@
+
+/* =========================
+   COLOUR PALETTE
+========================= */
+
+:root {
+    --background: #F1EFED;
+    --burgundy: #542B35;
+    --terracotta: #6B3E35;
+    --text: #302B2A;
+    --sage: #899487;
+    --white: #FFFFFF;
+}
+
+/* =========================
+   GENERAL
+========================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    background-color: var(--background);
+    color: var(--text);
+    font-family: Georgia, serif;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+header {
+    background-color: var(--burgundy);
+    padding: 35px 5% 25px;
+    text-align: center;
+}
+
+.heading {
+    color: var(--background);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    letter-spacing: 5px;
+    margin: 0 0 8px;
+}
+
+header p {
+    color: var(--background);
+    letter-spacing: 3px;
+    font-size: 0.8rem;
+    margin: 0;
+}
+
+/* =========================
+   NAVIGATION
+========================= */
+
+.navigation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(25px, 5vw, 65px);
+    padding: 20px;
+    background-color: var(--background);
+}
+
+.navigation a {
+    color: var(--burgundy);
+    text-decoration: none;
+    font-family: Arial, sans-serif;
+    font-size: 0.85rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    transition: color 0.2s ease;
+}
+
+.navigation a:hover {
+    color: var(--terracotta);
+}
+
+/* =========================
+   MAIN CONTENT
+========================= */
+
+.main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 8%;
+    gap: 35px;
+}
+
+.main img {
+    width: 100%;
+    max-width: 1100px;
+    max-height: 550px;
+    object-fit: cover;
+    border-radius: 18px;
+}
+
+/* =========================
+   ABOUT SECTION
+========================= */
+
+.about {
+    max-width: 750px;
+    text-align: center;
+    margin: 20px auto;
+}
+
+.about h2 {
+    color: var(--burgundy);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: normal;
+    margin-bottom: 20px;
+}
+
+.about p {
+    font-family: Arial, sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.9;
+    color: var(--text);
+}
+
+/* =========================
+   BOOKING BUTTON
+========================= */
+
+.book-button {
+    display: inline-block;
+    background-color: var(--terracotta);
+    color: var(--white);
+    padding: 16px 32px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-family: Arial, sans-serif;
+    font-size: 0.85rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    transition: background-color 0.2s ease;
+}
+
+.book-button:hover {
+    background-color: var(--burgundy);
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+footer {
+    background-color: var(--burgundy);
+    color: var(--background);
+    text-align: center;
+    padding: 30px;
+    margin-top: 60px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 650px) {
+
+    .navigation {
+        gap: 20px;
+        padding: 18px 10px;
+    }
+
+    .navigation a {
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+    }
+
+    .main {
+        padding: 25px 5%;
+    }
+
+    .main img {
+        border-radius: 12px;
+    }
+}
+

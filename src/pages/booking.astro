@@ -1,0 +1,272 @@
+---
+import "../styles/global.css";
+import "../styles/homepage.css";
+import "../styles/booking.css";
+
+const businessName = "Clairs Paws 4 Perfection";
+---
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Book an Appointment | {businessName}</title>
+    </head>
+
+    <body>
+        <header>
+            <h1 class="heading">{businessName}.</h1>
+            <p>DOG GROOMING · CHADDERTON</p>
+        </header>
+
+        <nav class="navigation">
+            <a href="/">HOME</a>
+            <a href="/gallery">GALLERY</a>
+            <a href="/booking">BOOK</a>
+        </nav>
+
+        <main class="booking-main">
+            <section class="booking-intro">
+                <p class="eyebrow">LET'S GET YOUR DOG PAMPERED</p>
+                <h2>Book an appointment.</h2>
+                <p>
+                    Choose a date and time that works for you. We look forward
+                    to welcoming your furry friend.
+                </p>
+            </section>
+
+            <form id="booking-form" class="booking-form">
+                <section class="booking-section">
+                    <div class="section-heading">
+                        <span>01</span>
+                        <h3>Choose a date</h3>
+                    </div>
+
+                    <label for="booking-date">Appointment date</label>
+                    <input type="date" id="booking-date" name="date" required />
+                    <p class="field-hint">
+                        Monday–Thursday and Saturdays only.
+                    </p>
+                </section>
+
+                <section class="booking-section">
+                    <div class="section-heading">
+                        <span>02</span>
+                        <h3>Choose a time</h3>
+                    </div>
+
+                    <div id="time-slots" class="time-slots">
+                        <p class="field-hint">Please select a date first.</p>
+                    </div>
+
+                    <input
+                        type="hidden"
+                        name="time"
+                        id="selected-time"
+                        required
+                    />
+                </section>
+
+                <section class="booking-section">
+                    <div class="section-heading">
+                        <span>03</span>
+                        <h3>Your details</h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label for="owner-name">Your name</label>
+                            <input
+                                type="text"
+                                id="owner-name"
+                                name="owner"
+                                placeholder="Full name"
+                                required
+                            />
+                        </div>
+
+                        <div class="form-field">
+                            <label for="phone">Phone number</label>
+                            <input
+                                type="tel"
+                                id="phone"
+                                name="phone"
+                                placeholder="Your phone number"
+                                required
+                            />
+                        </div>
+
+                        <div class="form-field full-width">
+                            <label for="email">Email address</label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder="you@example.com"
+                                required
+                            />
+                        </div>
+                    </div>
+                </section>
+
+                <section class="booking-section">
+                    <div class="section-heading">
+                        <span>04</span>
+                        <h3>About your dog</h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label for="dog-name">Dog's name</label>
+                            <input
+                                type="text"
+                                id="dog-name"
+                                name="dog"
+                                placeholder="Your dog's name"
+                                required
+                            />
+                        </div>
+
+                        <div class="form-field">
+                            <label for="breed">Breed</label>
+                            <input
+                                type="text"
+                                id="breed"
+                                name="breed"
+                                placeholder="e.g. Cockapoo"
+                                required
+                            />
+                        </div>
+
+                        <div class="form-field full-width">
+                            <label for="size">Dog's size</label>
+                            <select id="size" name="size" required>
+                                <option value="">Select size</option>
+                                <option value="Small">Small</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Large">Large</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="deposit-section">
+                    <div>
+                        <p class="eyebrow">SECURE YOUR APPOINTMENT</p>
+                        <h3>Booking deposit</h3>
+                        <p>A £1 deposit is required to secure your booking.</p>
+                    </div>
+
+                    <span class="deposit-price">£1.00</span>
+                </section>
+
+                <button type="submit" class="booking-submit">
+                    Continue to payment →
+                </button>
+
+                <p class="booking-disclaimer">
+                    Your appointment is not confirmed until payment has been
+                    completed and availability verified.
+                </p>
+
+                <p id="booking-message" role="status"></p>
+            </form>
+        </main>
+
+        <footer>
+            <p>{businessName} · CHADDERTON</p>
+        </footer>
+
+        <script>
+            const dateInput = document.querySelector("#booking-date");
+            const timeSlots = document.querySelector("#time-slots");
+            const selectedTime = document.querySelector("#selected-time");
+            const bookingForm = document.querySelector("#booking-form");
+            const message = document.querySelector("#booking-message");
+
+            const today = new Date();
+            const localToday = new Date(
+                today.getTime() - today.getTimezoneOffset() * 60000,
+            )
+                .toISOString()
+                .split("T")[0];
+
+            dateInput.min = localToday;
+
+            function generateSlots(date) {
+                const day = date.getDay();
+
+                let start;
+                let end;
+
+                if (day >= 1 && day <= 4) {
+                    start = 16;
+                    end = 20;
+                } else if (day === 6) {
+                    start = 9;
+                    end = 18;
+                } else {
+                    return [];
+                }
+
+                const slots = [];
+
+                for (let hour = start; hour < end; hour++) {
+                    slots.push(`${String(hour).padStart(2, "0")}:00`);
+                }
+
+                return slots;
+            }
+
+            dateInput.addEventListener("change", () => {
+                timeSlots.innerHTML = "";
+                selectedTime.value = "";
+
+                if (!dateInput.value) return;
+
+                const date = new Date(`${dateInput.value}T12:00:00`);
+
+                const slots = generateSlots(date);
+
+                if (slots.length === 0) {
+                    timeSlots.innerHTML =
+                        "<p class='field-hint'>Sorry, we are closed on this day. Please choose another date.</p>";
+                    return;
+                }
+
+                slots.forEach((time) => {
+                    const button = document.createElement("button");
+
+                    button.type = "button";
+                    button.className = "time-slot";
+                    button.textContent = time;
+
+                    button.addEventListener("click", () => {
+                        document
+                            .querySelectorAll(".time-slot")
+                            .forEach((slot) =>
+                                slot.classList.remove("selected"),
+                            );
+
+                        button.classList.add("selected");
+                        selectedTime.value = time;
+                    });
+
+                    timeSlots.appendChild(button);
+                });
+            });
+
+            bookingForm.addEventListener("submit", (event) => {
+                event.preventDefault();
+
+                if (!selectedTime.value) {
+                    message.textContent = "Please select an appointment time.";
+                    return;
+                }
+
+                message.textContent =
+                    "Booking interface ready! Payment and live availability will be connected in the next stage.";
+            });
+        </script>
+    </body>
+</html>
