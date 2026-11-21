@@ -44,6 +44,7 @@ const businessName = "Clairs Paws 4 Perfection";
 
                     <label for="booking-date">Appointment date</label>
                     <input type="date" id="booking-date" name="date" required />
+
                     <p class="field-hint">
                         Monday–Thursday and Saturdays only.
                     </p>
@@ -107,6 +108,7 @@ const businessName = "Clairs Paws 4 Perfection";
                             />
                         </div>
                     </div>
+
                 </section>
 
                 <section class="booking-section">
@@ -184,7 +186,9 @@ const businessName = "Clairs Paws 4 Perfection";
             const bookingForm = document.querySelector("#booking-form");
             const message = document.querySelector("#booking-message");
 
+            // Set minimum date to today using local time
             const today = new Date();
+
             const localToday = new Date(
                 today.getTime() - today.getTimezoneOffset() * 60000,
             )
@@ -193,79 +197,126 @@ const businessName = "Clairs Paws 4 Perfection";
 
             dateInput.min = localToday;
 
-            function generateSlots(date) {
-                const day = date.getDay();
-
-                let start;
-                let end;
-
-                if (day >= 1 && day <= 4) {
-                    start = 16;
-                    end = 20;
-                } else if (day === 6) {
-                    start = 9;
-                    end = 18;
-                } else {
-                    return [];
-                }
-
-                const slots = [];
-
-                for (let hour = start; hour < end; hour++) {
-                    slots.push(`${String(hour).padStart(2, "0")}:00`);
-                }
-
-                return slots;
-            }
-
-            dateInput.addEventListener("change", () => {
+            // Fetch available appointment slots
+            dateInput.addEventListener("change", async () => {
                 timeSlots.innerHTML = "";
                 selectedTime.value = "";
+                message.textContent = "";
 
                 if (!dateInput.value) return;
 
-                const date = new Date(`${dateInput.value}T12:00:00`);
+                timeSlots.innerHTML =
+                    "<p class='field-hint'>Checking availability...</p>";
 
-                const slots = generateSlots(date);
+                try {
+                    const response = await fetch(
+                        `/api/availability?date=${encodeURIComponent(dateInput.value)}`,
+                    );
 
-                if (slots.length === 0) {
-                    timeSlots.innerHTML =
-                        "<p class='field-hint'>Sorry, we are closed on this day. Please choose another date.</p>";
-                    return;
-                }
+                    const result = await response.json();
 
-                slots.forEach((time) => {
-                    const button = document.createElement("button");
+                    if (!response.ok) {
+                        throw new Error(
+                            result.error || "Unable to check availability.",
+                        );
+                    }
 
-                    button.type = "button";
-                    button.className = "time-slot";
-                    button.textContent = time;
+                    if (result.slots.length === 0) {
+                        timeSlots.innerHTML =
+                            "<p class='field-hint'>Sorry, we are closed on this day. Please choose another date.</p>";
+                        return;
+                    }
 
-                    button.addEventListener("click", () => {
-                        document
-                            .querySelectorAll(".time-slot")
-                            .forEach((slot) =>
-                                slot.classList.remove("selected"),
-                            );
+                    result.slots.forEach((slot) => {
+                        const button = document.createElement("button");
 
-                        button.classList.add("selected");
-                        selectedTime.value = time;
+                        button.type = "button";
+                        button.className = "time-slot";
+                        button.textContent = slot.available
+                            ? slot.time
+                            : `${slot.time} — Unavailable`;
+
+                        button.disabled = !slot.available;
+
+                        button.addEventListener("click", () => {
+                            document
+                                .querySelectorAll(".time-slot")
+                                .forEach((item) => {
+                                    item.classList.remove("selected");
+                                });
+
+                            button.classList.add("selected");
+                            selectedTime.value = slot.time;
+                        });
+
+                        timeSlots.appendChild(button);
                     });
+                } catch (error) {
+                    console.error("Availability error:", error);
 
-                    timeSlots.appendChild(button);
-                });
+                    timeSlots.innerHTML =
+                        "<p class='field-hint'>Unable to check availability. Please try again.</p>";
+                }
             });
 
-            bookingForm.addEventListener("submit", (event) => {
+            // Submit booking and create Stripe Checkout session
+            bookingForm.addEventListener("submit", async (event) => {
                 event.preventDefault();
+
+                message.textContent = "";
 
                 if (!selectedTime.value) {
                     message.textContent = "Please select an appointment time.";
                     return;
                 }
 
-                message.textContent =
-                    "Booking interface ready! Payment and live availability will be connected in the next stage.";
+                const submitButton = bookingForm.querySelector(
+                    'button[type="submit"]',
+                );
+
+                submitButton.disabled = true;
+                submitButton.textContent = "Preparing payment...";
+
+                try {
+                    const formData = new FormData(bookingForm);
+
+                    const bookingDetails = Object.fromEntries(
+                        formData.entries(),
+                    );
+
+                    const response = await fetch("/api/book", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(bookingDetails),
+                    });
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(
+                            result.error || "Unable to create your booking.",
+                        );
+                    }
+
+                    if (!result.checkoutUrl) {
+                        throw new Error("Payment link was not returned.");
+                    }
+
+                    // Redirect customer to Stripe Checkout
+                    window.location.href = result.checkoutUrl;
+                } catch (error) {
+                    console.error("Booking submission failed:", error);
+
+                    message.textContent =
+                        error instanceof Error
+                            ? error.message
+                            : "Something went wrong. Please try again.";
+
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Continue to payment →";
+                }
             });
         </script>
     </body>
