@@ -53,15 +53,21 @@ export const GET: APIRoute = async ({ request }) => {
         .eq("appointment_date", date)
         .in("booking_status", ["pending", "confirmed"]);
 
+    console.log("Availability query result:", {
+        error: error?.message ?? null,
+        count: data?.length ?? null,
+        firstAppointment: data?.[0] ?? null
+    });
+
     if (error) {
-        console.error("Availability lookup failed:", error.message);
+        console.error("Availability lookup failed:", error);
 
         return Response.json(
             { error: "Unable to check availability." },
             { status: 500 }
         );
     }
-
+    
     const appointments = data ?? [];
 
     const slots = [];
